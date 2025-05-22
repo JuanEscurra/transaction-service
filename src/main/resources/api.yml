@@ -1,0 +1,115 @@
+openapi: "3.0.0"
+info:
+  title: Transaction Service API
+  description: API para registrar pagos y gastos sobre productos financieros como cuentas de ahorro, cuentas corrientes y depósitos a plazo fijo.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8082
+    description: Local development server
+
+tags:
+  - name: Transacciones
+    description: Operaciones de pagos y egresos
+
+paths:
+  /transactions:
+    post:
+      summary: Registrar una transacción
+      operationId: createTransaction
+      tags:
+        - Transacciones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Transacción creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Error de validación
+  /transactions/product/{productId}:
+    get:
+      summary: Listar transacciones por ID de producto
+      description: Obtiene una lista de todas las transacciones asociadas a un producto financiero específico.
+      tags:
+        - Transacciones
+      operationId: getTransactionsByProductId
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: El ID del producto para el cual se desean obtener las transacciones.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de transacciones asociadas al producto especificado.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Producto no encontrado o sin transacciones.
+        '500':
+          description: Error interno del servidor.
+components:
+  schemas:
+    TransactionRequest:
+      type: object
+      required:
+        - productId
+        - amount
+        - type
+      properties:
+        productId:
+          type: string
+          description: ID del producto financiero afectado
+        amount:
+          type: number
+          format: double
+          description: Monto de la transacción
+        type:
+          type: string
+          enum: [INCOME, EXPENSE]
+          description: Tipo de transacción
+        description:
+          type: string
+          description: Detalle de la operación
+    TransactionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "64e1d8a2e8c5f024c46a7f1b"
+          description: Identificador único de la transacción.
+        productId:
+          type: string
+          example: "product-1234"
+          description: Identificador del producto financiero relacionado.
+        amount:
+          type: number
+          format: double
+          example: 1500.00
+          description: Monto de la transacción.
+        type:
+          type: string
+          enum: [ INCOME, EXPENSE ]
+          example: "INCOME"
+          description: Tipo de transacción (INCOME para ingresos, EXPENSE para egresos).
+        description:
+          type: string
+          example: "Depósito de sueldo"
+          description: Descripción adicional de la transacción.
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-05-21T15:30:00Z"
+          description: Fecha y hora en que se realizó la transacción.
