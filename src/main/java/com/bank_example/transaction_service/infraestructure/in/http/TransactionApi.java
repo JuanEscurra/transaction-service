@@ -1,11 +1,13 @@
 package com.bank_example.transaction_service.infraestructure.in.http;
 
+import com.bank_example.transaction_service.domain.usecases.CreateTransactionUseCase;
 import com.bank_example.transaction_service.domain.usecases.GetTransactionsByProductIdUseCase;
 import com.bank_example.transaction_service.infraestructure.in.http.api.TransactionsApiDelegate;
 import com.bank_example.transaction_service.infraestructure.in.http.mappers.TransactionApiMapper;
 import com.bank_example.transaction_service.infraestructure.in.http.model.TransactionRequest;
 import com.bank_example.transaction_service.infraestructure.in.http.model.TransactionResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -20,13 +22,18 @@ import java.time.ZoneId;
 public class TransactionApi implements TransactionsApiDelegate {
 
     private final GetTransactionsByProductIdUseCase getTransactionsByProductId;
-    private final TransactionApiMapper transactionApiMapper;
+    private final CreateTransactionUseCase createTransaction;
+    private final TransactionApiMapper mapper;
 
-    /* PENDIENTE POR FINALIZAR */
     @Override
     public Mono<ResponseEntity<TransactionResponse>> createTransaction(Mono<TransactionRequest> transactionRequest, ServerWebExchange exchange) {
+        ZoneId zoneId = this.getTimezone(exchange);
 
-        return TransactionsApiDelegate.super.createTransaction(transactionRequest, exchange);
+        return transactionRequest
+                .map(this.mapper::toTransaction)
+                .flatMap(this.createTransaction::createTransaction)
+                .map(transaction -> this.mapper.toTransactionResponse(transaction, zoneId))
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }
 
     @Override
@@ -34,7 +41,7 @@ public class TransactionApi implements TransactionsApiDelegate {
         ZoneId zoneId = this.getTimezone(exchange);
 
         Flux<TransactionResponse> fluxTransactions = this.getTransactionsByProductId.getTransactionsByProductId(productId)
-                .map(transaction -> this.transactionApiMapper.toTransactionResponse(transaction, zoneId));
+                .map(transaction -> this.mapper.toTransactionResponse(transaction, zoneId));
 
         return Mono.just(ResponseEntity.ok(fluxTransactions));
     }

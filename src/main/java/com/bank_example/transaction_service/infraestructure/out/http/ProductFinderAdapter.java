@@ -22,7 +22,7 @@ public class ProductFinderAdapter implements ProductFinderPort {
     public Mono<Product> findByProductId(String productId) {
         return this.userWebClientBuilder.build()
                 .get()
-                .uri("http://client-service/clients/{productId}", productId)
+                .uri("http://product-service/products/{productId}", productId)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, response -> Mono.error(new Exception("Product not found")))

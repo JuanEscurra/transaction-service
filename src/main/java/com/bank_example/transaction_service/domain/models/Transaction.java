@@ -10,11 +10,12 @@ public class Transaction {
 
     private String id;
     private String productId;
-    private String sourceProductId;
+    private String counterProductId;
     private BigDecimal amount;
     private TransactionType type;
     private String description;
     private Instant createdAt;
+    private String operationId;
 
 
 }

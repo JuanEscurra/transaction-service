@@ -13,6 +13,25 @@ public class TransactionPersistenceMapper {
         transaction.setAmount(transactionDoc.getAmount());
         transaction.setDescription(transactionDoc.getDescription());
         transaction.setType(transactionDoc.getType());
+        transaction.setCreatedAt(transactionDoc.getCreatedAt());
+        transaction.setProductId(transactionDoc.getProductId());
+        transaction.setCounterProductId(transactionDoc.getCounterProductId());
+        transaction.setOperationId(transactionDoc.getOperationId());
+
         return transaction;
+    }
+
+    public TransactionDoc toTransactionDoc(Transaction transaction) {
+        TransactionDoc transactionDoc = new TransactionDoc();
+        transactionDoc.setId(transaction.getId());
+        transactionDoc.setAmount(transaction.getAmount());
+        transactionDoc.setDescription(transaction.getDescription());
+        transactionDoc.setType(transaction.getType());
+        transactionDoc.setCreatedAt(transaction.getCreatedAt());
+        transactionDoc.setOperationId(transaction.getOperationId());
+        transactionDoc.setProductId(transaction.getProductId());
+        transactionDoc.setCounterProductId(transaction.getCounterProductId());
+
+        return transactionDoc;
     }
 }
