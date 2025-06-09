@@ -1,22 +1,5 @@
 spring:
   application:
     name: transaction-service
-  data:
-    mongodb:
-      uri: mongodb://admin:123456789@localhost:27017/bd_transactions?authSource=admin
   profiles:
-    default: default
-  cloud:
-    config:
-      uri: http://localhost:8888
-      fail-fast: true
-  config:
-    import: "configserver:"
-server:
-  port: 0
-eureka:
-  instance:
-    instance-id: ${spring.application.name}:${random.uuid}
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+    default: dev
